@@ -33,22 +33,27 @@ By default, `GlobalFetch` resolves the response text as JSON if response data ty
 await(await http.get('./index.html')).text();
 ```
 
-Query and post data example:
+Query and post data usage example:
 
 ```js
-// query with parameters
-const query = { foo: 1, bar: 2 };
+// query data via parameters
+const query = { user_id: 1 };
 await http.get('/users', { query });
 
 // post JSON data
 const json = { username: 'jiraiyame', age: 27 };
-await http.post('/createUser', { json });
+await http.post('/create_user', { json });
 
-// post formData
+// post form data via `FormData` API
 const form = document.querySelector('form');
-await http.post('/submit', {
+await http.post('/create_profile', {
   body: new FormData(form),
 });
+
+// post form data via serialized form fields
+// form `enctype` attribute is `application/x-www-form-urlencoded`
+const form = { foo: 1, bar: [1, 2, 3] };
+await http.post('/submit', { form });
 ```
 
 ## API
