@@ -136,12 +136,12 @@ class GlobalFetch {
       this.setHeader('Content-Type', 'application/x-www-form-urlencoded');
     }
 
-    if (!isAbsoluteURL(url)) {
-      url = combineURL(this.baseUrl, url);
-    }
-
     if (headers && isObject(headers)) {
       this.setHeaders(headers);
+    }
+
+    if (!isAbsoluteURL(url)) {
+      url = combineURL(this.baseUrl, url);
     }
 
     if (query && isObject(query)) {
@@ -170,7 +170,7 @@ class GlobalFetch {
       })
       .catch((e) => {
         const err: IFetchErrorMessage = {
-          method: this.opts.headers.method,
+          method: this.opts.method,
           url,
           body: rest,
           error: e,
