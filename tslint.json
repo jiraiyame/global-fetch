@@ -1,0 +1,13 @@
+// https://github.com/palantir/tslint/blob/master/src/configs/recommended.ts
+{
+  "extends": ["tslint:recommended"],
+  "rules": {
+    "quotemark": [true,
+      "single",
+      "avoid-escape"
+    ],
+    "no-console": [true, "log", "trace"],
+    "member-access": [true, "no-public"],
+    "object-literal-sort-keys": false
+  }
+}

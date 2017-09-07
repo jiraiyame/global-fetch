@@ -1,0 +1,57 @@
+{
+  "name": "global-fetch",
+  "version": "0.1.0",
+  "description": "Promise-based HTTP client built on top of the global fetch API",
+  "main": "dist/src/global-fetch.js",
+  "scripts": {
+    "start": "npm run compile",
+    "test": "mocha test",
+    "clean": "rimraf dist",
+    "compile": "npm run clean && npm run tsc",
+    "tsc": "tsc -w",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "tslint"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jiraiyame/global-fetch.git"
+  },
+  "keywords": [
+    "fetch",
+    "request",
+    "netword",
+    "promise",
+    "http-client",
+    "global-fetch"
+  ],
+  "author": "zhengzong.fu <jiraiyame@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jiraiyame/global-fetch/issues"
+  },
+  "homepage": "https://github.com/jiraiyame/global-fetch#readme",
+  "dependencies": {
+    "isomorphic-fetch": "^2.2.1"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.0.4",
+    "@types/mocha": "^2.2.42",
+    "@types/node": "^8.0.26",
+    "chai": "^4.1.2",
+    "cz-conventional-changelog": "^2.0.0",
+    "lint-staged": "^4.1.2",
+    "mocha": "^3.5.0",
+    "rimraf": "^2.6.1",
+    "tslint": "^5.7.0",
+    "typescript": "^2.5.2"
+  }
+}
