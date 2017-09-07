@@ -18,7 +18,7 @@ npm install --save global-fetch
 import * as http from 'global-fetch';
 
 (async () => {
-  const headers = { foo: 1 };
+  const headers = new Headers();
   try {
     const r = await http.get('http://jsonplaceholder.typicode.com/users', { headers });
   } catch (e) {
@@ -38,7 +38,7 @@ Query and post data usage example:
 ```js
 // query data via parameters
 const query = { user_id: 1 };
-await http.get('/users', { query });
+await http.get('/users', { query }); // query url: /users?user_id=1
 
 // post JSON data
 const json = { username: 'jiraiyame', age: 27 };
