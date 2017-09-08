@@ -33,7 +33,7 @@ const DEFAULT_FETCH_OPTIONS = {
   },
 };
 
-class GlobalFetch {
+export class GlobalFetch {
 
   private opts: any = DEFAULT_FETCH_OPTIONS;
 
