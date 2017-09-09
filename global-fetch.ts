@@ -74,7 +74,7 @@ export class GlobalFetch {
     } else if (isObject(auth)) {
       authToken = auth.token;
       if (auth.type) {
-        this.setAuthType(auth.type);
+        this.authType = auth.type;
       }
     }
     this.setHeader('Authorization', `${this.authType} ${authToken}`);
@@ -114,10 +114,6 @@ export class GlobalFetch {
   options(url: string, opts: IRequestOptions) {
     this.setMethod('OPTIONS');
     return this.request(url, opts);
-  }
-
-  private setAuthType(type: string) {
-    this.authType = type;
   }
 
   private setMethod(method: AllowedFetchMethod) {
