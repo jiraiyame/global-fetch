@@ -2,17 +2,16 @@
 
 Promise-based HTTP client built on top of the global fetch API.
 
-## Install
+## Installing
 
 ```sh
 yarn add global-fetch
-```
-or
-```sh
+
+# or via npm
 npm install --save global-fetch
 ```
 
-## Usage
+## Examples
 
 ```js
 import * as http from 'global-fetch';

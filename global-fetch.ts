@@ -1,7 +1,7 @@
 import 'isomorphic-fetch';
-import isObject from './utils/is-object';
-import serialize from './utils/serialize';
-import { combineURL, isAbsoluteURL } from './utils/url';
+import isObject from './lib/is-object';
+import serialize from './lib/serialize';
+import { combineURL, isAbsoluteURL } from './lib/url';
 
 export type AllowedFetchMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'HEAD' | 'OPTIONS';
 
