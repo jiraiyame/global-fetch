@@ -82,31 +82,31 @@ const r = http(url, options);
   - token &lt;string&gt; the credentials of the auth
 
 ### r.get(url, options)
-- `url` &lt;string&gt; url of the resource
+- `url` &lt;string&gt; url or path of the resource
 - `options` &lt;Object&gt; custom settings apply to the request
 
 ### r.post(url, options)
-- `url` &lt;string&gt; url of the resource
+- `url` &lt;string&gt; url or path of the resource
 - `options` &lt;Object&gt; custom settings apply to the request
 
 ### r.put(url, options)
-- `url` &lt;string&gt; url of the resource
+- `url` &lt;string&gt; url or path of the resource
 - `options` &lt;Object&gt; custom settings apply to the request
 
 ### r.patch(url, options)
-- `url` &lt;string&gt; url of the resource
+- `url` &lt;string&gt; url or path of the resource
 - `options` &lt;Object&gt; custom settings apply to the request
 
 ### r.del(url, options)
-- `url` &lt;string&gt; url of the resource
+- `url` &lt;string&gt; url or path of the resource
 - `options` &lt;Object&gt; custom settings apply to the request
 
 ### r.head(url, options)
-- `url` &lt;string&gt; url of the resource
+- `url` &lt;string&gt; url or path of the resource
 - `options` &lt;Object&gt; custom settings apply to the request
 
 ### r.options(url, options)
-- `url` &lt;string&gt; url of the resource
+- `url` &lt;string&gt; url or path of the resource
 - `options` &lt;Object&gt; custom settings apply to the request
 
 ## License
