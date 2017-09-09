@@ -146,7 +146,7 @@ export class GlobalFetch {
 
     if (query && isObject(query)) {
       const querystr = serialize(query);
-      if (querystr.includes('?')) {
+      if (url.includes('?')) {
         url += querystr;
       } else {
         url += `?${querystr}`;
