@@ -176,7 +176,7 @@ export class GlobalFetch {
   }
 }
 
-export default function(url: string, opts: any) {
+export default function http(url: string, opts: any) {
   return new GlobalFetch(url, opts);
 }
 export const get = (url: string, opts: IRequestOptions = {}) => new GlobalFetch().get(url, opts);
