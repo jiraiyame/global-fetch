@@ -121,7 +121,11 @@ export class GlobalFetch {
   }
 
   private request(url: string, opts: IRequestOptions): Promise<any> {
-    const { json, form, headers, query, ...rest } = opts;
+    const { headers, json, form, query, ...rest } = opts;
+
+    if (headers && isObject(headers)) {
+      this.setHeaders(headers);
+    }
 
     if (isObject(json)) {
       rest.body = JSON.stringify(json);
@@ -130,10 +134,6 @@ export class GlobalFetch {
     if (form && isObject(form)) {
       rest.body = serialize(form);
       this.setHeader('Content-Type', 'application/x-www-form-urlencoded');
-    }
-
-    if (headers && isObject(headers)) {
-      this.setHeaders(headers);
     }
 
     if (!isAbsoluteURL(url)) {
@@ -149,12 +149,14 @@ export class GlobalFetch {
       }
     }
 
-    return fetch(url, { ...this.opts, ...rest })
-      .then((response) => {
+    const fetchOpts = { ...this.opts, ...rest };
+
+    return fetch(url, fetchOpts)
+      .then((response: Response) => {
         if (response.ok) {
           const emptyCodes = [204, 205];
           if (emptyCodes.indexOf(response.status) !== -1) {
-            return null;
+            return response.text();
           }
           const contentType = response.headers.get('Content-Type');
           if (contentType && contentType.includes('application/json')) {
@@ -164,11 +166,11 @@ export class GlobalFetch {
         }
         throw response;
       })
-      .catch((e) => {
+      .catch((e: Response) => {
         const err: IFetchErrorMessage = {
           method: this.opts.method,
           url,
-          body: rest,
+          body: rest.body,
           error: e,
         };
         throw err;

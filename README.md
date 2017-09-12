@@ -76,10 +76,10 @@ const r = http(url, options);
 - `value` &lt;any&gt; header field value
 
 ### r.setToken(auth)
-- auth &lt;string&gt; the credentials of the auth
-- auth: { token, type }
-  - type &lt;string&gt; the authentication scheme. Defaults to `Bearer`
-  - token &lt;string&gt; the credentials of the auth
+- `auth` &lt;string&gt; the credentials of the auth
+- `auth: { token, type }`
+  - `type` &lt;string&gt; the authentication scheme. Defaults to `Bearer`
+  - `token` &lt;string&gt; the credentials of the auth
 
 ### r.get(url, options)
 - `url` &lt;string&gt; url or path of the resource
