@@ -1,6 +1,6 @@
 {
   "name": "global-fetch",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Promise-based HTTP client built on top of the global fetch API",
   "main": "dist/global-fetch.js",
   "scripts": {
