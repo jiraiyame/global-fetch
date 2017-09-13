@@ -59,7 +59,7 @@ await http.post('/users', {
   body: new FormData(form),
 });
 
-// post form via url encoded request
+// post data via url encoded request
 const form = { foo: 1, bar: [1, 2, 3] };
 await http.post('/users', { form });
 ```
@@ -90,7 +90,7 @@ const r = http(baseUrl, options);
   - `type` &lt;string&gt; the authentication scheme. Defaults to `Bearer`
   - `token` &lt;string&gt; the credentials of the auth
 
-## r.setResponseType(responseType)
+### r.setResponseType(responseType)
 - `responseType` &lt;string | null&gt; the response data type will respond. Defaults to `json`
 
 ### r.get(url[, options])
