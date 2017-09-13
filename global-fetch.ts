@@ -5,19 +5,11 @@ import { combineURL, isAbsoluteURL } from './lib/url';
 
 export type AllowedFetchMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'HEAD' | 'OPTIONS';
 
-export interface IFetchErrorMessage {
-  method: AllowedFetchMethod;
-  url: string;
-  body?: any;
-  error: Response;
-}
-
-export interface IRequestOptions {
+export interface IRequestOptions extends RequestInit {
   json?: object;
   form?: object;
   query?: object;
-  body?: any;
-  headers?: object;
+  responseType?: string;
 }
 
 export interface IAuthToken {
@@ -39,18 +31,26 @@ export class GlobalFetch {
 
   private authType: string = 'Bearer';
 
+  private responseType: string | null = 'json';
+
   constructor(
     private baseUrl: string = '',
     opts: any = {},
   ) {
     this.setBaseUrl(baseUrl);
-    if (opts.headers) {
-      this.setHeaders(opts.headers);
+    const { headers } = opts;
+    if (headers && isObject(headers)) {
+      this.setHeaders(headers);
     }
   }
 
-  setBaseUrl(url: string) {
-    this.baseUrl = url;
+  setBaseUrl(baseUrl: string) {
+    this.baseUrl = baseUrl;
+    return this;
+  }
+
+  setHeader(name: string, val: any) {
+    this.setHeaders({ [name]: val });
     return this;
   }
 
@@ -59,11 +59,6 @@ export class GlobalFetch {
       ...this.opts.headers,
       ...headers,
     };
-    return this;
-  }
-
-  setHeader(name: string, val: any) {
-    this.setHeaders({ [name]: val });
     return this;
   }
 
@@ -81,37 +76,41 @@ export class GlobalFetch {
     return this;
   }
 
-  get(url: string, opts: IRequestOptions) {
+  setResponseType(responseType: string | null) {
+    this.responseType = responseType;
+  }
+
+  get(url: string, opts: IRequestOptions = {}) {
     this.setMethod('GET');
     return this.request(url, opts);
   }
 
-  post(url: string, opts: IRequestOptions) {
+  post(url: string, opts: IRequestOptions = {}) {
     this.setMethod('POST');
     return this.request(url, opts);
   }
 
-  put(url: string, opts: IRequestOptions) {
+  put(url: string, opts: IRequestOptions = {}) {
     this.setMethod('PUT');
     return this.request(url, opts);
   }
 
-  patch(url: string, opts: IRequestOptions) {
+  patch(url: string, opts: IRequestOptions = {}) {
     this.setMethod('PATCH');
     return this.request(url, opts);
   }
 
-  delete(url: string, opts: IRequestOptions) {
+  delete(url: string, opts: IRequestOptions = {}) {
     this.setMethod('DELETE');
     return this.request(url, opts);
   }
 
-  head(url: string, opts: IRequestOptions) {
+  head(url: string, opts: IRequestOptions = {}) {
     this.setMethod('HEAD');
     return this.request(url, opts);
   }
 
-  options(url: string, opts: IRequestOptions) {
+  options(url: string, opts: IRequestOptions = {}) {
     this.setMethod('OPTIONS');
     return this.request(url, opts);
   }
@@ -121,10 +120,41 @@ export class GlobalFetch {
   }
 
   private request(url: string, opts: IRequestOptions): Promise<any> {
-    const { headers, json, form, query, ...rest } = opts;
+    const { responseType, headers, json, form, query, ...rest } = opts;
+
+    // Ignore method to avoid confusion
+    if (rest.method) {
+      delete rest.method;
+    }
+
+    if (responseType) {
+      this.setResponseType(responseType);
+    }
 
     if (headers && isObject(headers)) {
       this.setHeaders(headers);
+    }
+
+    if (!isAbsoluteURL(url)) {
+      url = combineURL(this.baseUrl, url);
+    }
+
+    let querystr;
+    if (query && isObject(query)) {
+      querystr = serialize(query);
+    }
+
+    // Send data as query string if request is GET or HEAD method
+    const { method } = this.opts;
+    if (rest.body && (method === 'GET' || method === 'HEAD')) {
+      querystr = serialize(rest.body);
+      delete rest.body;
+    }
+
+    if (url.includes('?')) {
+      url += querystr;
+    } else {
+      url += `?${querystr}`;
     }
 
     if (isObject(json)) {
@@ -136,55 +166,45 @@ export class GlobalFetch {
       this.setHeader('Content-Type', 'application/x-www-form-urlencoded');
     }
 
-    if (!isAbsoluteURL(url)) {
-      url = combineURL(this.baseUrl, url);
-    }
-
-    if (query && isObject(query)) {
-      const querystr = serialize(query);
-      if (url.includes('?')) {
-        url += querystr;
-      } else {
-        url += `?${querystr}`;
-      }
-    }
-
-    const fetchOpts = { ...this.opts, ...rest };
-
-    return fetch(url, fetchOpts)
-      .then((response: Response) => {
+    return fetch(url, { ...this.opts, ...rest })
+      .then((response) => {
         if (response.ok) {
-          const emptyCodes = [204, 205];
-          if (emptyCodes.indexOf(response.status) !== -1) {
-            return response.text();
-          }
-          const contentType = response.headers.get('Content-Type');
-          if (contentType && contentType.includes('application/json')) {
-            return response.json();
-          }
-          return response;
+          return this.resolveResponse(response);
         }
         throw response;
       })
-      .catch((e: Response) => {
-        const err: IFetchErrorMessage = {
-          method: this.opts.method,
-          url,
-          body: rest.body,
-          error: e,
-        };
+      .catch((err) => {
         throw err;
       });
   }
+
+  private resolveResponse(response: Response) {
+    switch (this.responseType) {
+      case 'json':
+        return response.json();
+      case 'text':
+        return response.text();
+      case 'blob':
+        return response.blob();
+      case 'arrayBuffer':
+        return response.arrayBuffer();
+      case 'formData':
+        return response.formData();
+      default:
+        return response;
+    }
+  }
 }
 
-export default function http(url: string, opts: any) {
-  return new GlobalFetch(url, opts);
+export default function http(baseUrl: string = '', opts: any = {}) {
+  return new GlobalFetch(baseUrl, opts);
 }
-export const get = (url: string, opts: IRequestOptions = {}) => new GlobalFetch().get(url, opts);
-export const post = (url: string, opts: IRequestOptions = {}) => new GlobalFetch().post(url, opts);
-export const put = (url: string, opts: IRequestOptions = {}) => new GlobalFetch().put(url, opts);
-export const patch = (url: string, opts: IRequestOptions = {}) => new GlobalFetch().patch(url, opts);
-export const del = (url: string, opts: IRequestOptions = {}) => new GlobalFetch().delete(url, opts);
-export const head = (url: string, opts: IRequestOptions = {}) => new GlobalFetch().head(url, opts);
-export const options = (url: string, opts: IRequestOptions = {}) => new GlobalFetch().options(url, opts);
+
+const r = http();
+export const get = (url: string, opts: any) => r.get(url, opts);
+export const post = (url: string, opts: any) => r.post(url, opts);
+export const put = (url: string, opts: any) => r.put(url, opts);
+export const patch = (url: string, opts: any) => r.patch(url, opts);
+export const del = (url: string, opts: any) => r.delete(url, opts);
+export const head = (url: string, opts: any) => r.head(url, opts);
+export const options = (url: string, opts: any) => r.options(url, opts);
