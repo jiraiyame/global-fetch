@@ -18,7 +18,6 @@ export interface IAuthToken {
 }
 
 const DEFAULT_FETCH_OPTIONS = {
-  credentials: 'include',
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
@@ -27,21 +26,20 @@ const DEFAULT_FETCH_OPTIONS = {
 
 export class GlobalFetch {
 
-  private opts: any = DEFAULT_FETCH_OPTIONS;
-
   private authType: string = 'Bearer';
 
   private responseType: string | null = 'json';
 
   constructor(
     private baseUrl: string = '',
-    opts: any = {},
+    private opts: RequestInit = DEFAULT_FETCH_OPTIONS,
   ) {
     this.setBaseUrl(baseUrl);
-    const { headers } = opts;
+    const { headers, ...rest } = opts;
     if (headers && isObject(headers)) {
       this.setHeaders(headers);
     }
+    this.opts = { ...this.opts, ...rest };
   }
 
   setBaseUrl(baseUrl: string) {
