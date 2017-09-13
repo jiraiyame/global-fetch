@@ -2,7 +2,7 @@
   "name": "global-fetch",
   "version": "0.2.1",
   "description": "Promise-based HTTP client built on top of the global fetch API",
-  "main": "dist/global-fetch.js",
+  "main": "dist/lib/global-fetch.js",
   "scripts": {
     "start": "npm run compile",
     "test": "mocha dist/test/**/*.js",
