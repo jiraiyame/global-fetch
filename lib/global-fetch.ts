@@ -184,9 +184,9 @@ export class GlobalFetch {
         return response.text();
       case 'blob':
         return response.blob();
-      case 'arrayBuffer':
+      case 'arraybuffer':
         return response.arrayBuffer();
-      case 'formData':
+      case 'formdata':
         return response.formData();
       default:
         return response;
