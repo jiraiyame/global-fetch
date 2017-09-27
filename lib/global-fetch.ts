@@ -4,12 +4,13 @@ import serialize from './serialize';
 import { combineURL, isAbsoluteURL } from './url';
 
 export type AllowedFetchMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'HEAD' | 'OPTIONS';
+export type AllowedResponseType = 'json' | 'text' | 'blob' | 'arraybuffer' | 'formdata'
 
 export interface IRequestOptions extends RequestInit {
   json?: object;
   form?: object;
   query?: object;
-  responseType?: string;
+  responseType?: AllowedResponseType;
 }
 
 export interface IAuthToken {
@@ -25,21 +26,22 @@ const DEFAULT_FETCH_OPTIONS = {
 };
 
 export class GlobalFetch {
-
   private authType: string = 'Bearer';
-
-  private responseType: string | null = 'json';
+  private responseType: AllowedResponseType = 'json';
 
   constructor(
     private baseUrl: string = '',
-    private opts: RequestInit = DEFAULT_FETCH_OPTIONS,
+    private config: RequestInit = DEFAULT_FETCH_OPTIONS,
   ) {
     this.setBaseUrl(baseUrl);
-    const { headers, ...rest } = opts;
+
+    const { headers, ...rest } = config;
+
     if (headers && isObject(headers)) {
       this.setHeaders(headers);
     }
-    this.opts = { ...this.opts, ...rest };
+
+    this.config = { ...this.config, ...rest };
   }
 
   setBaseUrl(baseUrl: string) {
@@ -52,9 +54,9 @@ export class GlobalFetch {
     return this;
   }
 
-  setHeaders(headers: object) {
-    this.opts.headers = {
-      ...this.opts.headers,
+  setHeaders(headers: RequestInit['headers']) {
+    this.config.headers = {
+      ...this.config.headers,
       ...headers,
     };
     return this;
@@ -74,51 +76,54 @@ export class GlobalFetch {
     return this;
   }
 
-  setResponseType(responseType: string | null) {
+  setResponseType(responseType: AllowedResponseType) {
     this.responseType = responseType;
   }
 
-  get(url: string, opts: IRequestOptions = {}) {
+  get(url: string, config?: IRequestOptions) {
     this.setMethod('GET');
-    return this.request(url, opts);
+    return this.request(url, config);
   }
 
-  post(url: string, opts: IRequestOptions = {}) {
+  post(url: string, config?: IRequestOptions) {
     this.setMethod('POST');
-    return this.request(url, opts);
+    return this.request(url, config);
   }
 
-  put(url: string, opts: IRequestOptions = {}) {
+  put(url: string, config?: IRequestOptions) {
     this.setMethod('PUT');
-    return this.request(url, opts);
+    return this.request(url, config);
   }
 
-  patch(url: string, opts: IRequestOptions = {}) {
+  patch(url: string, config?: IRequestOptions) {
     this.setMethod('PATCH');
-    return this.request(url, opts);
+    return this.request(url, config);
   }
 
-  delete(url: string, opts: IRequestOptions = {}) {
+  delete(url: string, config?: IRequestOptions) {
     this.setMethod('DELETE');
-    return this.request(url, opts);
+    return this.request(url, config);
   }
 
-  head(url: string, opts: IRequestOptions = {}) {
+  head(url: string, config?: IRequestOptions) {
     this.setMethod('HEAD');
-    return this.request(url, opts);
+    return this.request(url, config);
   }
 
-  options(url: string, opts: IRequestOptions = {}) {
+  options(url: string, config?: IRequestOptions) {
     this.setMethod('OPTIONS');
-    return this.request(url, opts);
+    return this.request(url, config);
   }
 
   private setMethod(method: AllowedFetchMethod) {
-    this.opts.method = method;
+    this.config.method = method;
   }
 
-  private request(url: string, opts: IRequestOptions): Promise<any> {
-    const { responseType, headers, json, form, query, ...rest } = opts;
+  private request(
+    url: string,
+    config: IRequestOptions = {},
+  ): Promise<Response | Error> {
+    const { responseType, headers, json, form, query, ...rest } = config;
 
     // Ignore method to avoid confusion
     if (rest.method) {
@@ -143,7 +148,8 @@ export class GlobalFetch {
     }
 
     // Send data as query string if request is GET or HEAD method
-    const { method } = this.opts;
+    const { method } = this.config;
+
     if (rest.body && (method === 'GET' || method === 'HEAD')) {
       querystr = serialize(rest.body);
       delete rest.body;
@@ -164,19 +170,21 @@ export class GlobalFetch {
       this.setHeader('Content-Type', 'application/x-www-form-urlencoded');
     }
 
-    return fetch(url, { ...this.opts, ...rest })
-      .then((response) => {
-        if (response.ok) {
-          return this.resolveResponse(response);
-        }
-        throw response;
-      })
-      .catch((err) => {
-        throw err;
-      });
+    return fetch(url, { ...this.config, ...rest }).then((response) => {
+      if (response.ok) {
+        return this.resolveResponse(response);
+      }
+      throw response;
+    }).catch((err) => {
+      throw new Error(err.stack || err);
+    });
   }
 
   private resolveResponse(response: Response) {
+    if (!this.responseType) {
+      return response
+    }
+
     switch (this.responseType) {
       case 'json':
         return response.json();
@@ -189,20 +197,20 @@ export class GlobalFetch {
       case 'formdata':
         return response.formData();
       default:
-        return response;
+        throw new Error('Invalid response type')
     }
   }
 }
 
-export default function http(baseUrl: string = '', opts: any = {}) {
-  return new GlobalFetch(baseUrl, opts);
+export default function http(baseUrl: string = '', config?: IRequestOptions) {
+  return new GlobalFetch(baseUrl, config);
 }
 
-const r = http();
-export const get = (url: string, opts: any) => r.get(url, opts);
-export const post = (url: string, opts: any) => r.post(url, opts);
-export const put = (url: string, opts: any) => r.put(url, opts);
-export const patch = (url: string, opts: any) => r.patch(url, opts);
-export const del = (url: string, opts: any) => r.delete(url, opts);
-export const head = (url: string, opts: any) => r.head(url, opts);
-export const options = (url: string, opts: any) => r.options(url, opts);
+const request = http();
+export const get = (url: string, config?: IRequestOptions) => request.get(url, config);
+export const post = (url: string, config?: IRequestOptions) => request.post(url, config);
+export const put = (url: string, config?: IRequestOptions) => request.put(url, config);
+export const patch = (url: string, config?: IRequestOptions) => request.patch(url, config);
+export const del = (url: string, config?: IRequestOptions) => request.delete(url, config);
+export const head = (url: string, config?: IRequestOptions) => request.head(url, config);
+export const options = (url: string, config?: IRequestOptions) => request.options(url, config);

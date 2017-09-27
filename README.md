@@ -14,32 +14,33 @@ npm install --save global-fetch
 ## Examples
 
 ```js
-import * as request from 'global-fetch';
+import http, { get } from 'global-fetch';
 
 (async () => {
   const query = { userId: 1 };
   try {
-    await request.get('http://jsonplaceholder.typicode.com/users', { query });
+    await get('http://jsonplaceholder.typicode.com/users', { query });
   } catch (e) {
     console.error('err: ', e);
   }
 
   // or all requests with the same server url
-  const http = request.http('http://jsonplaceholder.typicode.com');
+  const request = http('http://jsonplaceholder.typicode.com');
   const json = { title: 'foo', body: 'bar', userId: 1 };
-  await http.get('/users');
-  await http.post('/post', { json });
+  await request.get('/users');
+  await request.post('/post', { json });
 })();
 ```
 
 By default, `GlobalFetch` resolves the response data as JSON. If any other formats you want to yield, do it like below.
 
 ```js
-// resolve response type as text alone
-await http.get('./index.html', { responseType: 'text' });
+// Resolve response type as text
+await get('./index.html', { responseType: 'text' });
 
-// or set response type to `null`, resolve the original response data
-await(await http.get('./index.html', { responseType: null })).text();
+// If response type is `null` or `undefined`,
+// resolve will be resolved as original string
+await get('./index.html', { responseType: null });
 ```
 
 Query and post data usage example:
@@ -47,79 +48,65 @@ Query and post data usage example:
 ```js
 // request as query string when method is GET or HEAD
 const query = { user_id: 1 };
-await http.get('/users', { query }); // /users?user_id=1
+await get('/users', { query }); // /users?user_id=1
 
 // post JSON
 const json = { name: 'jiraiyame', age: 27 };
-await http.post('/users', { json });
+await post('/users', { json });
 
 // post form
 const form = document.querySelector('form');
-await http.post('/users', {
+await post('/users', {
   body: new FormData(form),
 });
 
 // post data via url encoded request
 const form = { foo: 1, bar: [1, 2, 3] };
-await http.post('/users', { form });
+await post('/users', { form });
 ```
 
-## API
+## Interface
 
-### class:GlobalFetch
+### `class GlobalFetch`
 
-```js
-import http from 'global-fetch';
+#### Constructor
 
-const r = http(baseUrl, options);
+```ts
+constructor(baseUrl: string, config?: RequestInit);
 ```
 
-### r.setBaseUrl(url)
+### setBaseUrl(url)
 - `url` &lt;string&gt; the API host of the resource
 
-### r.setHeader(name, value)
+### setHeader(name, value)
 - `name` &lt;string&gt; header field name
 - `value` &lt;any&gt; header field value
 
-### r.setHeaders(headers)
+### setHeaders(headers)
 - `headers` &lt;Object&gt; custom header fields
 
-### r.setToken(auth)
+### setToken(auth)
 - `auth` &lt;string&gt; the credentials of the auth
 - `auth: { token, type }`
   - `type` &lt;string&gt; the authentication scheme. Defaults to `Bearer`
   - `token` &lt;string&gt; the credentials of the auth
 
-### r.setResponseType(responseType)
+### setResponseType(responseType)
 - `responseType` &lt;string | null&gt; the response data type will respond. Defaults to `json`
 
-### r.get(url[, options])
-- `url` &lt;string&gt; url or path of the resource
-- `options` &lt;Object&gt; custom settings apply to the request
+### get(url[, options])
 
-### r.post(url[, options])
-- `url` &lt;string&gt; url or path of the resource
-- `options` &lt;Object&gt; custom settings apply to the request
+### post(url[, options])
 
-### r.put(url[, options])
-- `url` &lt;string&gt; url or path of the resource
-- `options` &lt;Object&gt; custom settings apply to the request
+### put(url[, options])
 
-### r.patch(url[, options])
-- `url` &lt;string&gt; url or path of the resource
-- `options` &lt;Object&gt; custom settings apply to the request
+### patch(url[, options])
 
-### r.del(url[, options])
-- `url` &lt;string&gt; url or path of the resource
-- `options` &lt;Object&gt; custom settings apply to the request
+### del(url[, options])
 
-### r.head(url[, options])
-- `url` &lt;string&gt; url or path of the resource
-- `options` &lt;Object&gt; custom settings apply to the request
+### head(url[, options])
 
-### r.options(url[, options])
-- `url` &lt;string&gt; url or path of the resource
-- `options` &lt;Object&gt; custom settings apply to the request
+### options(url[, options])
 
 ## License
 

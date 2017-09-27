@@ -28,12 +28,12 @@
   "keywords": [
     "fetch",
     "request",
-    "netword",
+    "network",
     "promise",
     "http-client",
     "global-fetch"
   ],
-  "author": "zhengzong.fu <jiraiyame@gmail.com>",
+  "author": "zfu <jiraiyame@gmail.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/jiraiyame/global-fetch/issues"
