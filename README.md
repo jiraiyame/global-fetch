@@ -2,6 +2,15 @@
 
 Promise-based HTTP client built on top of the global fetch API.
 
+[![NPM version][npm-image]][npm-url]
+[![NPM downloads][downloads-image]][npm-url]
+
+[![global-fetch](https://nodei.co/npm/global-fetch.png)](https://www.npmjs.com/package/global-fetch)
+
+[npm-url]: https://www.npmjs.com/package/global-fetch
+[npm-image]: https://img.shields.io/npm/v/global-fetch.svg
+[downloads-image]: https://img.shields.io/npm/dm/global-fetch.svg
+
 ## Installing
 
 ```sh
