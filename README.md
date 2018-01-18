@@ -14,21 +14,20 @@ npm install --save global-fetch
 ## Examples
 
 ```js
-import http, { get } from 'global-fetch';
+import http, { get, post } from 'global-fetch';
 
 (async () => {
   const query = { userId: 1 };
   try {
     await get('http://jsonplaceholder.typicode.com/users', { query });
-  } catch (e) {
-    console.error('err: ', e);
-  }
+  } catch (e) {}
 
   // or all requests with the same server url
   const request = http('http://jsonplaceholder.typicode.com');
-  const json = { title: 'foo', body: 'bar', userId: 1 };
   await request.get('/users');
-  await request.post('/post', { json });
+  await request.post('/post', {
+    json: { title: 'foo', body: 'bar', userId: 1 }
+  });
 })();
 ```
 
@@ -38,23 +37,21 @@ By default, `GlobalFetch` resolves the response data as JSON. If any other forma
 // Resolve response type as text
 await get('./index.html', { responseType: 'text' });
 
-// If response type is `null` or `undefined`,
-// resolve will be resolved as original string
+// If response type is falsy value like `null`,
+// response will be resolved as original data
 await get('./index.html', { responseType: null });
 ```
-
-Query and post data usage example:
 
 ```js
 // request as query string when method is GET or HEAD
 const query = { user_id: 1 };
 await get('/users', { query }); // /users?user_id=1
 
-// post JSON
+// post JSON data
 const json = { name: 'jiraiyame', age: 27 };
 await post('/users', { json });
 
-// post form
+// post form data
 const form = document.querySelector('form');
 await post('/users', {
   body: new FormData(form),
