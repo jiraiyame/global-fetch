@@ -142,17 +142,14 @@ export class GlobalFetch {
       url = combineURL(this.baseUrl, url);
     }
 
+    const { method } = this.config;
+    if (rest.body && (method === 'GET' || method === 'HEAD')) {
+      throw new Error('`GET` or `HEAD` method can not have a body, use `query` instead')
+    }
+
     let querystr;
     if (query && isObject(query)) {
       querystr = serialize(query);
-    }
-
-    // Send data as query string if request is GET or HEAD method
-    const { method } = this.config;
-
-    if (rest.body && (method === 'GET' || method === 'HEAD')) {
-      querystr = serialize(rest.body);
-      delete rest.body;
     }
 
     if (url.includes('?')) {
